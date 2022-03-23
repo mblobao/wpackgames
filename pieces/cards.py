@@ -1,6 +1,6 @@
 from collections import Counter
 from random import shuffle
-from typing import Callable, Dict, List, Union
+from typing import Any, Callable, Union
 
 
 class Card:
@@ -16,13 +16,13 @@ class Card:
         numbers and suits retruns the possible values
     """
     # static properties
-    suits = {
+    __suits = {
         'D': {'symbol': '♢', 'value': 0.4},
         'S': {'symbol': '♠', 'value': 0.3},
         'H': {'symbol': '♡', 'value': 0.2},
         'C': {'symbol': '♣', 'value': 0.1}
     }
-    numbers = {'A': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13}
+    __numbers = {'A': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13}
 
     def __init__(self, number: Union[int, str], suit: str) -> None:
         if suit.upper() in Card.suits.keys():
@@ -34,20 +34,50 @@ class Card:
         else:
             raise ValueError('Unrecognized card number')
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(f"{self.__number}.{self.suits[self.__suit]['symbol']}")
     
-    def __repr__(self):
-        return str(self)
+    def __repr__(self) -> str:
+        return f'{self.__name__} {self}'
     
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, Card):
             raise TypeError('Can only compare Cards')
-        return str(self) == str(other)
-        
+        return self.value == other.value
+    
+    def __ne__(self, other: Any) -> bool:
+        if isinstance(other, Card):
+            raise TypeError('Can only compare Cards')
+        return self.value != other.value
+    
+    def __gt__(self, other: Any) -> bool:
+        if isinstance(other, Card):
+            raise TypeError('Can only compare Cards')
+        return self.value > other.value
+    
+    def __ge__(self, other: Any) -> bool:
+        if isinstance(other, Card):
+            raise TypeError('Can only compare Cards')
+        return self.value >= other.value
+    
+    def __lt__(self, other: Any) -> bool:
+        if isinstance(other, Card):
+            raise TypeError('Can only compare Cards')
+        return self.value < other.value
+    
+    def __le__(self, other: Any) -> bool:
+        if isinstance(other, Card):
+            raise TypeError('Can only compare Cards')
+        return self.value <= other.value
+    
     # protected properties
     number = property(fget=lambda self: self.__number)
     suit = property(fget=lambda self: self.__suit)
+    
+    @property
+    def value(self) -> float:
+        crd = str(self).split('.')
+        return self.numbers[crd[0]] + self.suits[crd[1]]['value']
 
 
 class Deck:
@@ -61,7 +91,7 @@ class Deck:
     """
     main = tuple(Card(number=i, suit=n) for i in Card.numbers.keys() for n in Card.suits.keys())
     
-    def __init__(self, n_decks: int = 1, values: Callable[[List[Card]], int] = None) -> None:
+    def __init__(self, n_decks: int = 1, values: Callable[[list[Card]], int] = None) -> None:
         """[summary]
 
         Args:
@@ -86,11 +116,12 @@ class Deck:
     def value(self) -> int:
         return self.__function(self.__set)
 
-    def shuffle(self) -> None:
+    def shuffle(self, n: int = 1) -> None:
         self.__init__()
-        shuffle(self.__set)
+        for _ in range(n):
+            shuffle(self.__set)
         
-    def sort(self, function: Callable[[List[Card]], int] = None) -> None:
+    def sort(self, function: Callable[[list[Card]], int] = None) -> None:
         self.__set = sorted(self.__set, key=self.__function if function is None else function)        
 
     def reset(self) -> None:
@@ -104,8 +135,8 @@ class Deck:
         else:
             raise TypeError('Can only add Cards or Decks')
 
-    def draw(self) -> Card:
-        return self.__set.pop(0)
+    def draw(self, n: int = 0) -> Card:
+        return self.__set.pop(n)
     
     def remove(self, card: Card) -> None:
         """Remove specific cards in the deck
@@ -118,7 +149,7 @@ class Deck:
     def clear(self):
         self.__init__(0, self.__function)
     
-    def count(self, card: Card = None) -> Union[int, Dict[Card, int]]:
+    def count(self, card: Card = None) -> Union[int, dict[Card, int]]:
         c = Counter(self.__set)
         if card is not None:
             return c[card]

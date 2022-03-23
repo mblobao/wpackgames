@@ -4,7 +4,6 @@ from typing import Union, Callable, List
 from random import choice
 
 
-
 class Player:
     """ Player class
     Properties:
