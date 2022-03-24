@@ -97,6 +97,8 @@ class Deck:
         Args:
             n_decks (int, optional): number of normal decks to form the full deck
             Defaults to 1.
+            
+            values: (Callable, optional): function that calculates the Deck value
         """
         self.__n = n_decks
         self.__set = list()

@@ -1,5 +1,6 @@
+from wpackgames.pieces.cards import Deck
+from wpackgames.pieces import Player
 from numpy.random import random
-from decks import Player, Deck
 
 
 class BJPlayer(Player):
